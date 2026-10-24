@@ -78,10 +78,22 @@ Fill this in as you go. Bullet points are fine — be specific, not long.
 
 ## Bonus questions
 
-Optional. Answer only the ones you got to — number them, skip the rest.
+1. **Reducing the proxy image size**:
+   * Instead of using a full `ubuntu:24.04` image, we can switch to a minimal base image like `nginx:alpine`.
+   * Alpine removes unneeded OS utilities, which drops the image size from ~80MB+ down to ~5-15MB and makes container builds much faster.
+   * Cleaning up package manager caches (`rm -rf /var/lib/apt/lists/*`) in the Dockerfile also prevents saving unnecessary temporary files.
 
->
+2. **Running as non-root user**:
+   * Running as `root` in production is a security risk if the container gets compromised.
+   * To fix this, we can create a non-root user (or use the built-in `nginx` user) in the Dockerfile using the `USER` instruction, and grant it permissions only to the required config and log directories.
+
+3. **Additional security & performance improvements**:
+   * Adding a `.dockerignore` file prevents sending local files, logs, and Git history to the Docker build context. This keeps builds fast and avoids exposing secret files.
 
 ---
 
 ## Anything you would do differently with more time
+
+* **Switch proxy base image**: Use `nginx:alpine` instead of Ubuntu to make the container image significantly smaller, safer, and faster to build.
+* **Add automated linting to CI**: Add automated code style and syntax checks (linting) to the GitHub Actions pipeline to catch mistakes early before code is merged.
+* **Improve test resilience**: Add a retry loop directly inside `test_integration.py` so the tests wait patiently for the proxy and backend to respond on startup.
